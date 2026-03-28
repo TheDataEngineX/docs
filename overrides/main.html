@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block extrahead %}
+  {{ super() }}
+  {% if page and page.is_homepage %}
+    {% include "templates/jsonld-software.html" %}
+  {% elif page %}
+    {% include "templates/jsonld-article.html" %}
+  {% endif %}
+  {% if page %}
+  <link rel="canonical" href="{{ page.canonical_url }}">
+  {% endif %}
+{% endblock %}
