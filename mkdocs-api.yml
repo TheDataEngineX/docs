@@ -1,0 +1,39 @@
+site_name: DataEngineX API Reference
+site_url: https://docs.thedataenginex.org/api-reference/
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: blue grey
+      accent: teal
+  features:
+    - content.code.copy
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            show_source: true
+            show_root_heading: true
+            heading_level: 2
+            members_order: source
+            docstring_style: google
+
+nav:
+  - Overview: api-reference/index.md
+  - api: api-reference/api.md
+  - core: api-reference/core.md
+  - data: api-reference/data.md
+  - lakehouse: api-reference/lakehouse.md
+  - middleware: api-reference/middleware.md
+  - ml: api-reference/ml.md
+  - plugins: api-reference/plugins.md
+  - dashboard: api-reference/dashboard.md
+  - warehouse: api-reference/warehouse.md
+
+docs_dir: docs
+site_dir: build/api-reference
