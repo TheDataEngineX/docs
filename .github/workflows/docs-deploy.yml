@@ -1,0 +1,80 @@
+name: Docs Deploy
+
+on:
+  repository_dispatch:
+    types: [docs-update, release]
+  schedule:
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['docs/**', 'mkdocs.yml', 'mkdocs-api.yml', 'templates/**']
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: docs-deploy
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          version: "latest"
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Assemble docs from source repos
+        run: bash scripts/assemble.sh
+        env:
+          GH_TOKEN: ${{ secrets.DOCS_DISPATCH_TOKEN }}
+
+      - name: Generate release blog post
+        if: github.event.action == 'release'
+        run: |
+          uv run python scripts/generate_release_post.py \
+            --repo "${{ github.event.client_payload.repo }}" \
+            --tag "${{ github.event.client_payload.tag }}"
+        env:
+          GH_TOKEN: ${{ secrets.DOCS_DISPATCH_TOKEN }}
+
+      - name: Build site with Zensical
+        run: uv run zensical build
+
+      - name: Build API reference
+        run: bash scripts/build-api-reference.sh
+
+      - name: Copy static files
+        run: |
+          cp static/robots.txt site/
+          cp static/CNAME site/
+
+      - name: Validate outputs
+        run: |
+          test -f site/sitemap.xml || echo "WARNING: sitemap.xml not found"
+          test -f site/robots.txt
+          test -f site/CNAME
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: github-pages
+    steps:
+      - uses: actions/deploy-pages@v4
