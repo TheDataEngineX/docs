@@ -1,0 +1,29 @@
+# Build output
+site/
+build/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# uv
+# uv.lock intentionally NOT ignored
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Assembled docs (pulled at build time)
+docs/framework/
+docs/studio/
+docs/deploy/
+src/
+
+# Claude Code
+.claude/settings.local.json
