@@ -4,7 +4,7 @@
 set -euo pipefail
 
 echo "Building API reference with MkDocs Material..."
-mkdocs build -f mkdocs-api.yml
+uv run mkdocs build -f mkdocs-api.yml
 
 # mkdocs-api.yml has site_dir: build/api-reference
 # MkDocs outputs the full site structure there, with api-reference/ nav pages
